@@ -1,14 +1,12 @@
 import { useState, useEffect } from "react";
-
-const WORK_SECONDS = 25 * 60;
-const BREAK_SECONDS = 5 * 60;
+import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 
 function ModeButton({ label, onClick, isActive }: { label: string; onClick: () => void; isActive: boolean }) {
   return (
     <button
       onClick={onClick}
       className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-        isActive ? "bg-accent text-white" : "text-muted"
+        isActive ? "bg-coral text-white" : "text-dim"
       }`}
     >
       {label}
@@ -18,11 +16,14 @@ function ModeButton({ label, onClick, isActive }: { label: string; onClick: () =
 
 function App() {
   const [mode, setMode] = useState<"work" | "break">("work");
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
+  const [workMinutes, setWorkMinutes] = useState(25);
+  const [breakMinutes, setBreakMinutes] = useState(5);
+  const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
+
   const RADIUS = 100;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
-  const totalSeconds = mode === "work" ? WORK_SECONDS : BREAK_SECONDS;
+  const totalSeconds = mode === "work" ? workMinutes * 60 : breakMinutes * 60;
   const offset = CIRCUMFERENCE * (1 - secondsLeft / totalSeconds);
 
   function formatTime(totalSeconds: number) {
@@ -54,12 +55,12 @@ function App() {
       <div className="flex bg-surface rounded-full p-1">
         <ModeButton
           label="Work"
-          onClick={() => { setMode("work"); setSecondsLeft(WORK_SECONDS); }}
+          onClick={() => { setMode("work"); setSecondsLeft(workMinutes * 60); }}
           isActive={mode === "work"}
         />
         <ModeButton
           label="Break"
-          onClick={() => { setMode("break"); setSecondsLeft(BREAK_SECONDS); }}
+          onClick={() => { setMode("break"); setSecondsLeft(breakMinutes * 60); }}
           isActive={mode === "break"}
         />
       </div>
@@ -99,7 +100,7 @@ function App() {
 
       <button
         onClick={() => setIsRunning((prev) => !prev)}
-        className="px-8 py-3 rounded-full bg-accent text-white font-semibold"
+        className="px-8 py-3 rounded-full bg-coral text-white font-semibold"
       >
         {isRunning ? "Pause" : "Start"}
       </button>
