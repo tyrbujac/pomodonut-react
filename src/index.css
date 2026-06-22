@@ -5,4 +5,7 @@
     --color-ink: oklch(0.25 0.02 60);     /* near-black text */
     --color-muted: oklch(0.55 0.02 60);   /* secondary text */
     --color-accent: oklch(0.68 0.17 25);  /* coral, for Start */
+    --color-donut: oklch(0.72 0.09 60); 
+    --color-surface: oklch(0.93 0.01 90);
+    --font-display: "Fredoka", bold;
 }

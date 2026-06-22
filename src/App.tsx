@@ -7,7 +7,9 @@ function ModeButton({ label, onClick, isActive }: { label: string; onClick: () =
   return (
     <button
       onClick={onClick}
-      className={isActive ? "bg-accent text-white" : "text-muted"}
+      className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+        isActive ? "bg-accent text-white" : "text-muted"
+      }`}
     >
       {label}
     </button>
@@ -18,6 +20,10 @@ function App() {
   const [mode, setMode] = useState<"work" | "break">("work");
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [isRunning, setIsRunning] = useState(false);
+  const RADIUS = 100;
+  const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+  const totalSeconds = mode === "work" ? WORK_SECONDS : BREAK_SECONDS;
+  const offset = CIRCUMFERENCE * (1 - secondsLeft / totalSeconds);
 
   function formatTime(totalSeconds: number) {
     const minutes = Math.floor(totalSeconds / 60);
@@ -29,7 +35,13 @@ function App() {
     if (!isRunning) return;
   
     const interval = setInterval(() => {
-      setSecondsLeft((prev) => prev - 1);
+      setSecondsLeft((prev) => {
+        if (prev <= 1) {
+          setIsRunning(false);
+          return 0;
+        }
+        return prev - 1;
+      });
     }, 1000);
   
     return () => clearInterval(interval);
@@ -37,9 +49,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center gap-8">
-      <h1 className="text-4xl font-bold">Pomodonut</h1>
+      <h1 className="text-5xl font-display font-medium">Pomodonut</h1>
 
-      <div className="flex gap-2">
+      <div className="flex bg-surface rounded-full p-1">
         <ModeButton
           label="Work"
           onClick={() => { setMode("work"); setSecondsLeft(WORK_SECONDS); }}
@@ -52,7 +64,38 @@ function App() {
         />
       </div>
       
-      <div className="text-6xl font-bold tabular-nums">{formatTime(secondsLeft)}</div>
+      <svg width="240" height="240" viewBox="0 0 240 240">
+        <circle
+          cx="120"
+          cy="120"
+          r={RADIUS}
+          fill="none"
+          stroke="var(--color-surface)"
+          strokeWidth="20"
+        />
+        <circle
+          cx="120"
+          cy="120"
+          r={RADIUS}
+          fill="none"
+          stroke="var(--color-donut)"
+          strokeWidth="20"
+          strokeDasharray={CIRCUMFERENCE}
+          strokeDashoffset={-offset}
+          transform="rotate(-90 120 120)"
+          style={{ transition: "stroke-dashoffset 1s linear" }}
+        />
+        <text
+          x="120"
+          y="120"
+          textAnchor="middle"
+          dominantBaseline="central"
+          className="text-4xl font-bold tabular-nums"
+          fill="currentColor"
+        >
+          {formatTime(secondsLeft)}
+        </text>
+      </svg>
 
       <button
         onClick={() => setIsRunning((prev) => !prev)}
