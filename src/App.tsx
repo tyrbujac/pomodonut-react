@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { motion } from "framer-motion";
 import { Settings } from "lucide-react";
+import { formatTime } from "./utils";
 
 function ModeButton({ label, onClick, isActive }: { label: string; onClick: () => void; isActive: boolean }) {
   return (
@@ -35,6 +36,9 @@ function App() {
   const [autoStart, setAutoStart] = useState(
     localStorage.getItem("autoStart") === "true"
   );
+  const [soundOn, setSoundOn] = useState(
+    localStorage.getItem("soundOn") !== "false"
+  );
   const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
 
   const RADIUS = 100;
@@ -42,10 +46,17 @@ function App() {
   const totalSeconds = mode === "work" ? workMinutes * 60 : breakMinutes * 60;
   const offset = CIRCUMFERENCE * (1 - secondsLeft / totalSeconds);
 
-  function formatTime(totalSeconds: number) {
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  function playChime() {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
   }
 
   useEffect(() => {
@@ -73,6 +84,7 @@ function App() {
   useEffect(() => {
     if (secondsLeft !== 0) return;
 
+    if (soundOn) playChime();
     const nextMode = mode === "work" ? "break" : "work";
     setMode(nextMode);
     setSecondsLeft(nextMode === "work" ? workMinutes * 60 : breakMinutes * 60);
@@ -83,7 +95,8 @@ function App() {
     localStorage.setItem("workMinutes", String(workMinutes));
     localStorage.setItem("breakMinutes", String(breakMinutes));
     localStorage.setItem("autoStart", String(autoStart));
-  }, [workMinutes, breakMinutes, autoStart]);
+    localStorage.setItem("soundOn", String(soundOn));
+  }, [workMinutes, breakMinutes, autoStart, soundOn]);
 
   return (
     <div className="min-h-screen text-ink flex flex-col transition-colors duration-700"
@@ -103,8 +116,9 @@ function App() {
               <label className="text-sm text-dim">Work minutes</label>
               <input
                 type="number"
+                min="1"
                 value={workMinutes}
-                onChange={(e) => setWorkMinutes(Number(e.target.value))}
+                onChange={(e) => setWorkMinutes(Math.max(1, Number(e.target.value)))}
                 className="border rounded-md px-3 py-2"
               />
             </div>
@@ -112,8 +126,9 @@ function App() {
               <label className="text-sm text-dim">Break minutes</label>
               <input
                 type="number"
+                min="1"
                 value={breakMinutes}
-                onChange={(e) => setBreakMinutes(Number(e.target.value))}
+                onChange={(e) => setBreakMinutes(Math.max(1, Number(e.target.value)))}
                 className="border rounded-md px-3 py-2"
               />
             </div>
@@ -124,6 +139,15 @@ function App() {
                 className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${autoStart ? "bg-coral" : "bg-surface"}`}
               >
                 <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${autoStart ? "translate-x-5" : "translate-x-0"}`} />
+              </button>
+            </div>
+            <div className="flex items-center justify-between mt-4">
+              <label className="text-sm text-dim">Sound</label>
+              <button
+                onClick={() => setSoundOn((prev) => !prev)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${soundOn ? "bg-coral" : "bg-surface"}`}
+              >
+                <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${soundOn ? "translate-x-5" : "translate-x-0"}`} />
               </button>
             </div>
           </DialogContent>
