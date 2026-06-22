@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { motion } from "framer-motion";
 import { Settings } from "lucide-react";
@@ -40,6 +40,22 @@ function App() {
     localStorage.getItem("soundOn") !== "false"
   );
   const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
+  const [session, setSession] = useState(0);
+
+  // Refs so the rAF loop always reads current values without restarting the effect
+  const modeRef = useRef(mode);
+  const workMinutesRef = useRef(workMinutes);
+  const breakMinutesRef = useRef(breakMinutes);
+  const autoStartRef = useRef(autoStart);
+  const soundOnRef = useRef(soundOn);
+
+  useLayoutEffect(() => {
+    modeRef.current = mode;
+    workMinutesRef.current = workMinutes;
+    breakMinutesRef.current = breakMinutes;
+    autoStartRef.current = autoStart;
+    soundOnRef.current = soundOn;
+  });
 
   const RADIUS = 100;
   const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
@@ -69,8 +85,15 @@ function App() {
     const loop = (now: number) => {
       const remaining = startRemaining - (now - startTs) / 1000;
       if (remaining <= 0) {
-        setSecondsLeft(0);
-        setIsRunning(false);
+        if (soundOnRef.current) playChime();
+        const nextMode = modeRef.current === "work" ? "break" : "work";
+        setMode(nextMode);
+        setSecondsLeft(nextMode === "work" ? workMinutesRef.current * 60 : breakMinutesRef.current * 60);
+        if (autoStartRef.current) {
+          setSession((s) => s + 1);
+        } else {
+          setIsRunning(false);
+        }
         return;
       }
       setSecondsLeft(remaining);
@@ -79,17 +102,7 @@ function App() {
 
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [isRunning]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (secondsLeft !== 0) return;
-
-    if (soundOn) playChime();
-    const nextMode = mode === "work" ? "break" : "work";
-    setMode(nextMode);
-    setSecondsLeft(nextMode === "work" ? workMinutes * 60 : breakMinutes * 60);
-    if (autoStart) setIsRunning(true);
-  }, [secondsLeft]);
+  }, [isRunning, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem("workMinutes", String(workMinutes));
