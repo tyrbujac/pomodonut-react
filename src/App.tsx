@@ -31,6 +31,9 @@ function App() {
   const [breakMinutes, setBreakMinutes] = useState(
     Number(localStorage.getItem("breakMinutes")) || 5
   );
+  const [autoStart, setAutoStart] = useState(
+    localStorage.getItem("autoStart") === "true"
+  );
   const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
 
   const RADIUS = 100;
@@ -61,12 +64,24 @@ function App() {
   }, [isRunning]);
 
   useEffect(() => {
+    if (secondsLeft !== 0) return;
+
+    const nextMode = mode === "work" ? "break" : "work";
+    setMode(nextMode);
+    setSecondsLeft(nextMode === "work" ? workMinutes * 60 : breakMinutes * 60);
+    if (autoStart) setIsRunning(true);
+  }, [secondsLeft]);
+
+  useEffect(() => {
     localStorage.setItem("workMinutes", String(workMinutes));
     localStorage.setItem("breakMinutes", String(breakMinutes));
-  }, [workMinutes, breakMinutes]);
+    localStorage.setItem("autoStart", String(autoStart));
+  }, [workMinutes, breakMinutes, autoStart]);
 
   return (
-    <div className="min-h-screen bg-bg text-ink flex flex-col">
+    <div className="min-h-screen text-ink flex flex-col transition-colors duration-700"
+    style={{ backgroundColor: mode === "work" ? "var(--color-bg)" : "var(--color-bg-break)" }}
+    >
       <header className="grid grid-cols-3 items-center p-6">
         <div />
         <h1 className="text-5xl font-display font-medium text-center">Pomodonut</h1>
@@ -92,6 +107,15 @@ function App() {
                 onChange={(e) => setBreakMinutes(Number(e.target.value))}
                 className="border rounded-md px-3 py-2"
               />
+            </div>
+            <div className="flex items-center justify-between mt-4">
+              <label className="text-sm text-dim">Auto-start next session</label>
+              <button
+                onClick={() => setAutoStart((prev) => !prev)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${autoStart ? "bg-coral" : "bg-surface"}`}
+              >
+                <span className={`absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${autoStart ? "translate-x-5" : "translate-x-0"}`} />
+              </button>
             </div>
           </DialogContent>
         </Dialog>

@@ -13,6 +13,7 @@
     --color-donut: oklch(0.72 0.09 60); 
     --color-surface: oklch(0.93 0.01 90);
     --font-display: "Fredoka", sans-serif;
+    --color-bg-break: oklch(0.96 0.02 150);
 }
 
 @theme inline {
