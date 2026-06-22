@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
 import { motion } from "framer-motion";
+import { Settings } from "lucide-react";
 
 function ModeButton({ label, onClick, isActive }: { label: string; onClick: () => void; isActive: boolean }) {
   return (
@@ -49,19 +50,25 @@ function App() {
 
   useEffect(() => {
     if (!isRunning) return;
-  
-    const interval = setInterval(() => {
-      setSecondsLeft((prev) => {
-        if (prev <= 1) {
-          setIsRunning(false);
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  
-    return () => clearInterval(interval);
-  }, [isRunning]);
+
+    const startTs = performance.now();
+    const startRemaining = secondsLeft;
+    let raf = 0;
+
+    const loop = (now: number) => {
+      const remaining = startRemaining - (now - startTs) / 1000;
+      if (remaining <= 0) {
+        setSecondsLeft(0);
+        setIsRunning(false);
+        return;
+      }
+      setSecondsLeft(remaining);
+      raf = requestAnimationFrame(loop);
+    };
+
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, [isRunning]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (secondsLeft !== 0) return;
@@ -87,7 +94,9 @@ function App() {
         <h1 className="text-5xl font-display font-medium text-center">Pomodonut</h1>
         <div className="flex justify-end">
         <Dialog>
-          <DialogTrigger className="text-dim">Settings</DialogTrigger>
+          <DialogTrigger aria-label="Settings" className="text-dim hover:text-ink transition-colors cursor-pointer">
+            <Settings size={27} />
+          </DialogTrigger>
           <DialogContent>
             <DialogTitle>Settings</DialogTitle>
             <div className="flex flex-col gap-2 mt-4">
@@ -155,7 +164,7 @@ function App() {
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={-offset}
             transform="rotate(-90 120 120)"
-            style={{ transition: "stroke-dashoffset 1s linear" }}
+            style={{ transition: "none" }}
           />
           <text
             x="120"
@@ -165,7 +174,7 @@ function App() {
             className="text-4xl font-bold tabular-nums"
             fill="currentColor"
           >
-            {formatTime(secondsLeft)}
+            {formatTime(Math.floor(secondsLeft))}
           </text>
         </svg>
 
