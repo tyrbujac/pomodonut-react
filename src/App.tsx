@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle } from "@/components/ui/dialog"
+import { motion } from "framer-motion";
 
 function ModeButton({ label, onClick, isActive }: { label: string; onClick: () => void; isActive: boolean }) {
   return (
     <button
       onClick={onClick}
-      className={`px-4 py-2 rounded-full font-semibold transition-colors ${
-        isActive ? "bg-coral text-white" : "text-dim"
-      }`}
+      className="relative px-4 py-2 rounded-full font-semibold cursor-pointer"
     >
-      {label}
+      {isActive && (
+        <motion.div
+          layoutId="toggle-pill"
+          className="absolute inset-0 bg-coral rounded-full"
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        />
+      )}
+      <span className={`relative z-10 ${isActive ? "text-white" : "text-dim"}`}>
+        {label}
+      </span>
     </button>
   );
 }
@@ -58,86 +66,92 @@ function App() {
   }, [workMinutes, breakMinutes]);
 
   return (
-    <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center gap-8">
-      <h1 className="text-5xl font-display font-medium">Pomodonut</h1>
+    <div className="min-h-screen bg-bg text-ink flex flex-col">
+      <header className="grid grid-cols-3 items-center p-6">
+        <div />
+        <h1 className="text-5xl font-display font-medium text-center">Pomodonut</h1>
+        <div className="flex justify-end">
+        <Dialog>
+          <DialogTrigger className="text-dim">Settings</DialogTrigger>
+          <DialogContent>
+            <DialogTitle>Settings</DialogTitle>
+            <div className="flex flex-col gap-2 mt-4">
+              <label className="text-sm text-dim">Work minutes</label>
+              <input
+                type="number"
+                value={workMinutes}
+                onChange={(e) => setWorkMinutes(Number(e.target.value))}
+                className="border rounded-md px-3 py-2"
+              />
+            </div>
+            <div className="flex flex-col gap-2 mt-4">
+              <label className="text-sm text-dim">Break minutes</label>
+              <input
+                type="number"
+                value={breakMinutes}
+                onChange={(e) => setBreakMinutes(Number(e.target.value))}
+                className="border rounded-md px-3 py-2"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
+        </div>
+      </header>
 
-      <div className="flex bg-surface rounded-full p-1">
-        <ModeButton
-          label="Work"
-          onClick={() => { setMode("work"); setSecondsLeft(workMinutes * 60); }}
-          isActive={mode === "work"}
-        />
-        <ModeButton
-          label="Break"
-          onClick={() => { setMode("break"); setSecondsLeft(breakMinutes * 60); }}
-          isActive={mode === "break"}
-        />
-      </div>
-      
-      <svg width="240" height="240" viewBox="0 0 240 240">
-        <circle
-          cx="120"
-          cy="120"
-          r={RADIUS}
-          fill="none"
-          stroke="var(--color-surface)"
-          strokeWidth="20"
-        />
-        <circle
-          cx="120"
-          cy="120"
-          r={RADIUS}
-          fill="none"
-          stroke="var(--color-donut)"
-          strokeWidth="20"
-          strokeDasharray={CIRCUMFERENCE}
-          strokeDashoffset={-offset}
-          transform="rotate(-90 120 120)"
-          style={{ transition: "stroke-dashoffset 1s linear" }}
-        />
-        <text
-          x="120"
-          y="120"
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="text-4xl font-bold tabular-nums"
-          fill="currentColor"
+      <main className="flex-1 flex flex-col items-center justify-center gap-8">
+        <div className="flex bg-surface rounded-full p-1">
+          <ModeButton
+            label="Work"
+            onClick={() => { setMode("work"); setSecondsLeft(workMinutes * 60); }}
+            isActive={mode === "work"}
+          />
+          <ModeButton
+            label="Break"
+            onClick={() => { setMode("break"); setSecondsLeft(breakMinutes * 60); }}
+            isActive={mode === "break"}
+          />
+        </div>
+
+        <svg width="240" height="240" viewBox="0 0 240 240">
+          <circle
+            cx="120"
+            cy="120"
+            r={RADIUS}
+            fill="none"
+            stroke="var(--color-surface)"
+            strokeWidth="20"
+          />
+          <circle
+            cx="120"
+            cy="120"
+            r={RADIUS}
+            fill="none"
+            stroke="var(--color-donut)"
+            strokeWidth="20"
+            strokeDasharray={CIRCUMFERENCE}
+            strokeDashoffset={-offset}
+            transform="rotate(-90 120 120)"
+            style={{ transition: "stroke-dashoffset 1s linear" }}
+          />
+          <text
+            x="120"
+            y="120"
+            textAnchor="middle"
+            dominantBaseline="central"
+            className="text-4xl font-bold tabular-nums"
+            fill="currentColor"
+          >
+            {formatTime(secondsLeft)}
+          </text>
+        </svg>
+
+        <button
+          onClick={() => setIsRunning((prev) => !prev)}
+          className="px-8 py-3 rounded-full bg-coral text-white font-semibold transition-transform hover:scale-105 active:scale-95 cursor-pointer"
         >
-          {formatTime(secondsLeft)}
-        </text>
-      </svg>
-
-      <button
-        onClick={() => setIsRunning((prev) => !prev)}
-        className="px-8 py-3 rounded-full bg-coral text-white font-semibold"
-      >
-        {isRunning ? "Pause" : "Start"}
-      </button>
-
-      <Dialog>
-        <DialogTrigger className="text-dim">Settings</DialogTrigger>
-        <DialogContent>
-        <DialogTitle>Settings</DialogTitle>
-        <div className="flex flex-col gap-2 mt-4">
-          <label className="text-sm text-dim">Work minutes</label>
-          <input
-            type="number"
-            value={workMinutes}
-            onChange={(e) => setWorkMinutes(Number(e.target.value))}
-            className="border rounded-md px-3 py-2"
-          />
-        </div>
-        <div className="flex flex-col gap-2 mt-4">
-          <label className="text-sm text-dim">Break minutes</label>
-          <input
-            type="number"
-            value={breakMinutes}
-            onChange={(e) => setBreakMinutes(Number(e.target.value))}
-            className="border rounded-md px-3 py-2"
-          />
-        </div>
-      </DialogContent>
-      </Dialog>
+          {isRunning ? "Pause" : "Start"}
+        </button>
+      </main>
     </div>
   );
 }
