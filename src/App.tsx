@@ -17,8 +17,12 @@ function ModeButton({ label, onClick, isActive }: { label: string; onClick: () =
 function App() {
   const [mode, setMode] = useState<"work" | "break">("work");
   const [isRunning, setIsRunning] = useState(false);
-  const [workMinutes, setWorkMinutes] = useState(25);
-  const [breakMinutes, setBreakMinutes] = useState(5);
+  const [workMinutes, setWorkMinutes] = useState(
+    Number(localStorage.getItem("workMinutes")) || 25
+  );
+  const [breakMinutes, setBreakMinutes] = useState(
+    Number(localStorage.getItem("breakMinutes")) || 5
+  );
   const [secondsLeft, setSecondsLeft] = useState(workMinutes * 60);
 
   const RADIUS = 100;
@@ -47,6 +51,11 @@ function App() {
   
     return () => clearInterval(interval);
   }, [isRunning]);
+
+  useEffect(() => {
+    localStorage.setItem("workMinutes", String(workMinutes));
+    localStorage.setItem("breakMinutes", String(breakMinutes));
+  }, [workMinutes, breakMinutes]);
 
   return (
     <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center gap-8">
@@ -104,6 +113,31 @@ function App() {
       >
         {isRunning ? "Pause" : "Start"}
       </button>
+
+      <Dialog>
+        <DialogTrigger className="text-dim">Settings</DialogTrigger>
+        <DialogContent>
+        <DialogTitle>Settings</DialogTitle>
+        <div className="flex flex-col gap-2 mt-4">
+          <label className="text-sm text-dim">Work minutes</label>
+          <input
+            type="number"
+            value={workMinutes}
+            onChange={(e) => setWorkMinutes(Number(e.target.value))}
+            className="border rounded-md px-3 py-2"
+          />
+        </div>
+        <div className="flex flex-col gap-2 mt-4">
+          <label className="text-sm text-dim">Break minutes</label>
+          <input
+            type="number"
+            value={breakMinutes}
+            onChange={(e) => setBreakMinutes(Number(e.target.value))}
+            className="border rounded-md px-3 py-2"
+          />
+        </div>
+      </DialogContent>
+      </Dialog>
     </div>
   );
 }
