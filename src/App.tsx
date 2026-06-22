@@ -1,122 +1,67 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useState, useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+const WORK_SECONDS = 25 * 60;
+const BREAK_SECONDS = 5 * 60;
 
+function ModeButton({ label, onClick, isActive }: { label: string; onClick: () => void; isActive: boolean }) {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+    <button
+      onClick={onClick}
+      className={isActive ? "bg-accent text-white" : "text-muted"}
+    >
+      {label}
+    </button>
+  );
 }
 
-export default App
+function App() {
+  const [mode, setMode] = useState<"work" | "break">("work");
+  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  const [isRunning, setIsRunning] = useState(false);
+
+  function formatTime(totalSeconds: number) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  useEffect(() => {
+    if (!isRunning) return;
+  
+    const interval = setInterval(() => {
+      setSecondsLeft((prev) => prev - 1);
+    }, 1000);
+  
+    return () => clearInterval(interval);
+  }, [isRunning]);
+
+  return (
+    <div className="min-h-screen bg-bg text-ink flex flex-col items-center justify-center gap-8">
+      <h1 className="text-4xl font-bold">Pomodonut</h1>
+
+      <div className="flex gap-2">
+        <ModeButton
+          label="Work"
+          onClick={() => { setMode("work"); setSecondsLeft(WORK_SECONDS); }}
+          isActive={mode === "work"}
+        />
+        <ModeButton
+          label="Break"
+          onClick={() => { setMode("break"); setSecondsLeft(BREAK_SECONDS); }}
+          isActive={mode === "break"}
+        />
+      </div>
+      
+      <div className="text-6xl font-bold tabular-nums">{formatTime(secondsLeft)}</div>
+
+      <button
+        onClick={() => setIsRunning((prev) => !prev)}
+        className="px-8 py-3 rounded-full bg-accent text-white font-semibold"
+      >
+        {isRunning ? "Pause" : "Start"}
+      </button>
+    </div>
+  );
+}
+
+export default App;
