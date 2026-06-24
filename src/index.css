@@ -6,14 +6,17 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --color-bg: oklch(0.97 0.01 90);     /* soft off-white */
-    --color-ink: oklch(0.25 0.02 60);     /* near-black text */
+    --color-bg: oklch(0.97 0.01 90);       /* soft off-white */
+    --color-ink: oklch(0.25 0.02 60);      /* near-black text */
     --color-dim: oklch(0.55 0.02 60);      /* secondary text */
-    --color-coral: oklch(0.68 0.17 25);   /* coral, for Start */
-    --color-donut: oklch(0.72 0.09 60); 
+    --color-coral: oklch(0.68 0.17 25);    /* coral, for Start */
+    --color-donut: oklch(0.72 0.09 60);    /* legacy, kept for reference */
     --color-surface: oklch(0.93 0.01 90);
     --font-display: "Fredoka", sans-serif;
     --color-bg-break: oklch(0.96 0.02 150);
+    --color-dough: oklch(0.93 0.05 82);    /* pale cream dough */
+    --color-choc: oklch(0.39 0.09 48);     /* chocolate brown coating */
+    --color-choc-dark: oklch(0.29 0.08 48);/* darker chocolate edge/shadow */
 }
 
 @theme inline {
