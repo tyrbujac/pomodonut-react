@@ -1,6 +1,6 @@
 # Pomodonut
 
-A Pomodoro timer with a donut progress ring. Work and break sessions, configurable durations, auto-start, and a completion chime.
+A Pomodoro timer with a donut progress indicator. Work and break sessions, configurable durations, auto-start, and a completion chime.
 
 **[pomodonut-react.netlify.app](https://pomodonut-react.netlify.app)**
 
