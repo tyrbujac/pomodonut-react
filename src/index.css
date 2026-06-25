@@ -6,17 +6,27 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-    --color-bg: oklch(0.97 0.01 90);       /* soft off-white */
-    --color-ink: oklch(0.25 0.02 60);      /* near-black text */
-    --color-dim: oklch(0.55 0.02 60);      /* secondary text */
-    --color-coral: oklch(0.68 0.17 25);    /* coral, for Start */
-    --color-donut: oklch(0.72 0.09 60);    /* legacy, kept for reference */
+    --color-bg: oklch(0.97 0.01 90);           /* soft off-white */
+    --color-ink: oklch(0.25 0.02 60);          /* near-black text */
+    --color-dim: oklch(0.55 0.02 60);          /* secondary text */
+    --color-coral: oklch(0.68 0.17 25);        /* coral — work accent */
+    --color-break: oklch(0.65 0.13 200);       /* teal — break accent */
+    --color-donut: oklch(0.72 0.09 60);        /* legacy, kept for reference */
     --color-surface: oklch(0.93 0.01 90);
     --font-display: "Fredoka", sans-serif;
-    --color-bg-break: oklch(0.96 0.02 150);
-    --color-dough: oklch(0.93 0.05 82);    /* pale cream dough */
-    --color-choc: oklch(0.39 0.09 48);     /* chocolate brown coating */
-    --color-choc-dark: oklch(0.29 0.08 48);/* darker chocolate edge/shadow */
+    --color-bg-break: oklch(0.95 0.025 210);   /* cool cream-blue for break bg */
+    --color-dough: oklch(0.76 0.10 50);        /* peachy dough — lighter, softer orange-pink */
+    --color-choc: oklch(0.35 0.10 48);         /* rich dark chocolate glaze */
+    --color-choc-dark: oklch(0.29 0.08 48);    /* darker choc edge/shadow */
+    --color-choc-glaze: oklch(0.50 0.08 48);   /* lighter glaze highlight */
+    /* sprinkle palette */
+    --sprinkle-pink: #f472b6;
+    --sprinkle-yellow: #fbbf24;
+    --sprinkle-cyan: #22d3ee;
+    --sprinkle-white: #f5f0e8;
+    --sprinkle-purple: #a78bfa;
+    --sprinkle-green: #4ade80;
+    --sprinkle-orange: #fb923c;
 }
 
 @theme inline {
