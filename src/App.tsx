@@ -290,6 +290,7 @@ function App() {
   const endTimeRef = useRef<number | null>(null);
   const rafRef = useRef<number>(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Timer engine: a scheduled timeout drives completion (fires even in
   //    background tabs); rAF keeps the on-screen number smooth while visible.
@@ -339,9 +340,17 @@ function App() {
     };
     rafRef.current = requestAnimationFrame(tick);
 
+    // 1s interval: keeps secondsLeft (and thus tab title + favicon) updating
+    // in background tabs where rAF is suspended by the browser.
+    intervalRef.current = setInterval(() => {
+      const rem = (endTimeRef.current! - Date.now()) / 1000;
+      if (rem > 0) setSecondsLeft(rem);
+    }, 1000);
+
     return () => {
       cancelAnimationFrame(rafRef.current);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isRunning, session]); // eslint-disable-line react-hooks/exhaustive-deps
 
