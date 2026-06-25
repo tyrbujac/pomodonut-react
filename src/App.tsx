@@ -359,7 +359,11 @@ function App() {
     // Title
     if (isRunning) {
       const label = mode === "work" ? "Work Time" : "Enjoy your break";
-      document.title = `${formatTime(secondsLeft)} – ${label}`;
+      const s = Math.ceil(secondsLeft);
+      const m = Math.floor(s / 60);
+      const sec = s % 60;
+      const compact = `${m}:${String(sec).padStart(2, "0")}`;
+      document.title = `${compact} left – ${label}`;
     } else {
       document.title = "Pomodonut";
     }
