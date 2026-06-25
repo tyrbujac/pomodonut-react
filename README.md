@@ -2,11 +2,13 @@
 
 A Pomodoro timer with a donut progress indicator. Work and break sessions, configurable durations, auto-start, and a completion chime.
 
-**[pomodonut-react.netlify.app](https://pomodonut-react.netlify.app)**
+**[pomodonut.tyrbujac.com](https://pomodonut.tyrbujac.com)**
 
 ## Features
 
 - Donut SVG progress ring animated at 60fps via `requestAnimationFrame`
+- Live favicon that mirrors the donut drain in the browser tab
+- Tab title shows time remaining while the timer is running
 - Work / break mode toggle with animated pill
 - Configurable session durations
 - Auto-start next session toggle
