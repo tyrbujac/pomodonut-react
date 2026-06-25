@@ -399,7 +399,7 @@ function App() {
     setIsRunning(next);
   };
 
-  const mins = Math.floor(secondsLeft / 60);
+  const mins = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const secs = String(Math.floor(secondsLeft) % 60).padStart(2, "0");
 
   return (
