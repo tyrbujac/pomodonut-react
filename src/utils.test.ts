@@ -6,16 +6,16 @@ describe("formatTime", () => {
     expect(formatTime(1500)).toBe("25:00");
   });
 
-  it("pads seconds with a leading zero", () => {
-    expect(formatTime(65)).toBe("1:05");
+  it("pads minutes and seconds with leading zeros", () => {
+    expect(formatTime(65)).toBe("01:05");
   });
 
-  it("handles seconds under ten", () => {
-    expect(formatTime(5)).toBe("0:05");
+  it("pads single-digit minutes", () => {
+    expect(formatTime(5)).toBe("00:05");
   });
 
   it("handles zero", () => {
-    expect(formatTime(0)).toBe("0:00");
+    expect(formatTime(0)).toBe("00:00");
   });
 });
 

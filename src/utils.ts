@@ -1,7 +1,7 @@
 export function formatTime(totalSeconds: number): string {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
-  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  return `${String(minutes).padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 }
 
 // Pie wedge centred at (130,130), starting at 12 o'clock, sweeping clockwise

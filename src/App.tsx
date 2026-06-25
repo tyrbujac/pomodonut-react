@@ -354,6 +354,43 @@ function App() {
     localStorage.setItem("soundOn", String(soundOn));
   }, [workSeconds, breakSeconds, autoStartBreak, autoStartWork, soundOn]);
 
+  // ── Document title + real-time favicon
+  useEffect(() => {
+    // Title
+    if (isRunning) {
+      const label = mode === "work" ? "Work Time" : "Enjoy your break";
+      document.title = `${formatTime(secondsLeft)} – ${label}`;
+    } else {
+      document.title = "Pomodonut";
+    }
+
+    // Favicon: mini 32×32 SVG donut mirroring current drain
+    const cx = 16, cy = 16, fr = 18;
+    let cpDefs = "";
+    let clipAttr = "";
+    if (progress > 0 && progress < 0.9999) {
+      const angle = progress * 2 * Math.PI;
+      const ex = (cx - fr * Math.sin(angle)).toFixed(2);
+      const ey = (cy - fr * Math.cos(angle)).toFixed(2);
+      const la = progress > 0.5 ? 1 : 0;
+      const d = `M ${cx},${cy} L ${cx},${cy - fr} A ${fr},${fr} 0 ${la} 0 ${ex},${ey} Z`;
+      cpDefs = `<defs><clipPath id="fc"><path d="${d}"/></clipPath></defs>`;
+      clipAttr = ` clip-path="url(#fc)"`;
+    }
+    const vivid = progress > 0
+      ? `<circle cx="16" cy="16" r="11" fill="none" stroke="#d4a882" stroke-width="10"${clipAttr}/><circle cx="16" cy="16" r="11" fill="none" stroke="#5c3317" stroke-width="7"${clipAttr}/>`
+      : "";
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">${cpDefs}<circle cx="16" cy="16" r="11" fill="none" stroke="#dcd2c8" stroke-width="10"/>${vivid}</svg>`;
+
+    let link = document.querySelector<HTMLLinkElement>("link[rel*='icon']");
+    if (!link) {
+      link = document.createElement("link");
+      link.rel = "icon";
+      document.head.appendChild(link);
+    }
+    link.href = "data:image/svg+xml," + encodeURIComponent(svg);
+  }, [secondsLeft, isRunning, mode, progress]);
+
   const handleStartPause = () => {
     const next = !isRunning;
     if (soundOnRef.current) {
@@ -370,15 +407,14 @@ function App() {
       className="min-h-screen text-ink flex flex-col transition-colors duration-700"
       style={{ backgroundColor: mode === "work" ? "var(--color-bg)" : "var(--color-bg-break)" }}
     >
-      <header className="grid grid-cols-3 items-center px-6 pt-6 pb-2">
-        <div />
+      <header className="relative flex items-center justify-center px-6 pt-6 pb-2">
         <h1
-          className="font-display font-medium text-center"
+          className="font-display font-medium leading-none"
           style={{ fontSize: "clamp(2.8rem, 7vw, 3.3rem)" }}
         >
           Pomodonut
         </h1>
-        <div className="flex justify-end">
+        <div className="absolute right-6">
           <Dialog>
             <DialogTrigger
               aria-label="Settings"
